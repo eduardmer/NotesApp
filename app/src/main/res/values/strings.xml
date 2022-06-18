@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Notes</string>
+
+    <string name="add_note">Add note</string>
+
+    <string name="title">Title</string>
+    <string name="description">Description</string>
+    <string name="detailed_description">Add a more detailed description</string>
+    <string name="reminder">Do you want to set a reminder?</string>
+    <string name="date_time">dd/mm/yyyy hh:mm:ss</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+</resources>
