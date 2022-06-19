@@ -13,8 +13,7 @@ public class Notes {
     private long createdDate;
     private long reminderDate;
 
-    public Notes(int id, String title, String description, long createdDate, long reminderDate){
-        this.id = id;
+    public Notes(String title, String description, long createdDate, long reminderDate){
         this.title = title;
         this.description = description;
         this.createdDate = createdDate;
