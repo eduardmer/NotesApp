@@ -2,6 +2,8 @@
     <string name="app_name">Notes</string>
 
     <string name="add_note">Add note</string>
+    <string name="delete_note">Note deleted successfully.</string>
+    <string name="error">An error occurred.</string>
 
     <string name="title">Title</string>
     <string name="description">Description</string>

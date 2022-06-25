@@ -5,8 +5,6 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
@@ -14,13 +12,16 @@ import com.notes.BR;
 import com.notes.R;
 import com.notes.data.Notes;
 import com.notes.databinding.ItemNoteBinding;
+import com.notes.ui.main.AdapterListener;
 import java.util.List;
 
 public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHolder> {
 
+    final AdapterListener listener;
     final List<Notes> notes;
 
-    public NotesAdapter(List<Notes> notes){
+    public NotesAdapter(AdapterListener listener, List<Notes> notes){
+        this.listener = listener;
         this.notes = notes;
     }
 
@@ -33,28 +34,28 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
             this.binding = binding;
         }
 
-        public void bind(Notes note) {
+        public void bind(AdapterListener listener, Notes note) {
             binding.setVariable(BR.data, note);
             binding.dateText.setText("18:24");
             binding.executePendingBindings();
-            binding.settingsButton.setOnClickListener(v -> showPopUpMenu(v.getContext(), v));
+            binding.settingsButton.setOnClickListener(v -> showPopUpMenu(listener, note, v.getContext(), v));
         }
 
         @SuppressLint("NonConstantResourceId")
-        private void showPopUpMenu(Context context, View button) {
+        private void showPopUpMenu(AdapterListener listener, Notes note, Context context, View button) {
             PopupMenu popupMenu = new PopupMenu(context, button);
             popupMenu.inflate(R.menu.menu);
             popupMenu.setForceShowIcon(true);
             popupMenu.setOnMenuItemClickListener(item -> {
                 switch (item.getItemId()) {
                     case R.id.save_button:
-                        Toast.makeText(context, "Save", Toast.LENGTH_SHORT).show();
+                        listener.createPDF(note.getTitle(), note.getDescription());
                         break;
                     case R.id.share_button:
-                        Toast.makeText(context, "Share", Toast.LENGTH_SHORT).show();
+                        listener.shareNote();
                         break;
                     case R.id.delete_button:
-                        Toast.makeText(context, "Delete", Toast.LENGTH_SHORT).show();
+                        listener.deleteNote(note.getId());
                         break;
                 }
                 return true;
@@ -74,7 +75,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
     @Override
     public void onBindViewHolder(@NonNull NoteViewHolder holder, int position) {
         Notes item = notes.get(position);
-        holder.bind(item);
+        holder.bind(listener, item);
     }
 
     public void update(List<Notes> notes){

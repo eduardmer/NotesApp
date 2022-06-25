@@ -24,8 +24,8 @@ public class NotesRepository {
        return notesDao.insertNote(note);
     }
 
-    public Completable deleteNote(Notes note){
-        return  notesDao.deleteNote(note);
+    public Completable deleteNote(int id){
+        return  notesDao.deleteNote(id);
     }
 
 }
