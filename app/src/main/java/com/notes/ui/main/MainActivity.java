@@ -11,6 +11,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.pdf.PdfDocument;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -27,6 +28,7 @@ import com.notes.ui.add_notes.AddNoteActivity;
 import com.notes.utils.PDFDocumentUtils;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
@@ -57,7 +59,15 @@ public class MainActivity extends AppCompatActivity implements AdapterListener{
 
     @Override
     public void createPDF(String title, String description) {
-        PDFDocumentUtils.createPDFDocument(title, description);
+        PdfDocument pdfDocument = PDFDocumentUtils.createPDFDocument(title, description);
+        File dir = new File(getFilesDir(), "Document.pdf");
+        try{
+            pdfDocument.writeTo(new FileOutputStream(dir));
+            Log.i("pergjigja", "sakte");
+        } catch (Exception e) {
+            Log.i("pergjigja", e.toString());
+        }
+        /*PDFDocumentUtils.createPDFDocument(title, description);
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel("default", "Channel name", NotificationManager.IMPORTANCE_DEFAULT);
@@ -74,14 +84,24 @@ public class MainActivity extends AppCompatActivity implements AdapterListener{
         builder.setSound(Settings.System.DEFAULT_NOTIFICATION_URI);
 
         NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        manager.notify(0, builder.build());
+        manager.notify(0, builder.build());*/
     }
 
     @Override
     public void shareNote() {
+        PdfDocument pdfDocument = PDFDocumentUtils.createPDFDocument("title", "description");
+        File dir = new File(getExternalFilesDir(null), "Document.pdf");
+        try{
+            pdfDocument.writeTo(new FileOutputStream(dir));
+            Log.i("pergjigja", "sakte");
+        } catch (Exception e) {
+            Log.i("pergjigja", e.toString());
+        }
+        pdfDocument.close();
         Intent shareIntent = new Intent();
         shareIntent.setAction(Intent.ACTION_SEND);
-        shareIntent.putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(MainActivity.this, BuildConfig.APPLICATION_ID+".provider", PDFDocumentUtils.createPDFDocument("title", "description")));
+        Log.i("pergjigja",dir.toURI().toString());
+        shareIntent.putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(this, getApplicationContext().getPackageName() + ".provider", dir));
         shareIntent.setType("application/pdf");
         startActivity(Intent.createChooser(shareIntent, null));
     }

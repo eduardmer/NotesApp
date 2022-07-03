@@ -15,7 +15,7 @@ import java.util.List;
 
 public class PDFDocumentUtils {
 
-    public static File createPDFDocument(String title, String description) {
+    public static PdfDocument createPDFDocument(String title, String description) {
         PdfDocument pdfDocument = new PdfDocument();
         MyPageSplitter pageSplitter = new MyPageSplitter(title, description, Constants.PAGE_WIDTH, Constants.PAGE_HEIGHT);
         List<CharSequence> pdfPages = pageSplitter.getPages();
@@ -30,18 +30,7 @@ public class PDFDocumentUtils {
             staticLayout.draw(canvas);
             pdfDocument.finishPage(page);
         }
-        File file = new File(Environment.getExternalStorageDirectory() + "/Notes");
-        if (!file.exists())
-            file.mkdirs();
-        File dir = new File(file, "Document.pdf");
-        try{
-            pdfDocument.writeTo(new FileOutputStream(dir));
-            Log.i("pergjigja", "sakte");
-        } catch (Exception e) {
-            Log.i("pergjigja", e.toString());
-        }
-        pdfDocument.close();
-        return dir;
+        return pdfDocument;
     }
 
 }
