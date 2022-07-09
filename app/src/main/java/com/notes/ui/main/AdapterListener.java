@@ -2,7 +2,7 @@ package com.notes.ui.main;
 
 public interface AdapterListener {
 
-    void shareNote();
+    void shareNote(String title, String description);
 
     void createPDF(String title, String description);
 

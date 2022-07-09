@@ -52,7 +52,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
                         listener.createPDF(note.getTitle(), note.getDescription());
                         break;
                     case R.id.share_button:
-                        listener.shareNote();
+                        listener.shareNote(note.getTitle(), note.getDescription());
                         break;
                     case R.id.delete_button:
                         listener.deleteNote(note.getId());
