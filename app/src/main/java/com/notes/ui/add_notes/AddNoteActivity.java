@@ -21,6 +21,7 @@ public class AddNoteActivity extends AppCompatActivity {
 
     ActivityAddNoteBinding binding;
     final CompositeDisposable compositeDisposable = new CompositeDisposable();
+    Long date, time;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +33,7 @@ public class AddNoteActivity extends AppCompatActivity {
         binding.setViewModel(viewModel);
 
         binding.reminderSwitch.setOnCheckedChangeListener(((compoundButton, b) -> viewModel.setReminder(b)));
-        binding.dateContainer.setOnClickListener(v -> MaterialDatePicker.Builder.datePicker().setTitleText("Select date").build().show(getSupportFragmentManager(), "tag"));
+        binding.dateText.setOnClickListener(v -> showDatePicker());
         binding.cancelButton.setOnClickListener(v -> goBack());
         binding.saveButton.setOnClickListener(v -> {
             if (binding.titleText.getText().toString().isEmpty() || binding.descriptionText.getText().toString().isEmpty())
@@ -49,6 +50,19 @@ public class AddNoteActivity extends AppCompatActivity {
 
     private void goBack(){
         onBackPressed();
+    }
+
+    private void showDatePicker() {
+        MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder.datePicker().setTitleText("Select date").build();
+        datePicker.addOnPositiveButtonClickListener(this::setDate);
+        datePicker.show(getSupportFragmentManager(), "tag");
+    }
+
+    private void setDate(Long date) {
+        this.date = date;
+    }
+
+    private void setAlarm() {
     }
 
     @Override

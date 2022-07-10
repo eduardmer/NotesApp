@@ -1,16 +1,11 @@
 package com.notes.utils;
 
 import android.graphics.Canvas;
+import android.graphics.Typeface;
 import android.graphics.pdf.PdfDocument;
-import android.net.Uri;
-import android.os.Environment;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
-import android.util.Log;
-
-import java.io.File;
-import java.io.FileOutputStream;
 import java.util.List;
 
 public class PDFDocumentUtils {
@@ -23,10 +18,19 @@ public class PDFDocumentUtils {
             PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(Constants.PAGE_WIDTH, Constants.PAGE_HEIGHT, i+1).create();
             PdfDocument.Page page = pdfDocument.startPage(pageInfo);
             Canvas canvas = page.getCanvas();
-            StaticLayout staticLayout = new StaticLayout(pdfPages.get(i).toString(), new TextPaint(), Constants.PAGE_WIDTH - 2 * Constants.PAGE_PADDING, Layout.Alignment.ALIGN_NORMAL,
-                    Constants.SPACING_MULT, Constants.SPACING_ADD, false);
             canvas.save();
             canvas.translate(Constants.PAGE_PADDING, Constants.PAGE_PADDING);
+            if (i == 0) {
+                TextPaint titleText = new TextPaint();
+                titleText.setTextSize(25);
+                titleText.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+                StaticLayout titleStaticLayout = new StaticLayout(title, titleText, Constants.PAGE_WIDTH - 2 * Constants.PAGE_PADDING, Layout.Alignment.ALIGN_NORMAL,
+                        Constants.SPACING_MULT, Constants.SPACING_ADD, false);
+                titleStaticLayout.draw(canvas);
+                canvas.translate(0, titleStaticLayout.getHeight());
+            }
+            StaticLayout staticLayout = new StaticLayout(pdfPages.get(i).toString(), new TextPaint(), Constants.PAGE_WIDTH - 2 * Constants.PAGE_PADDING, Layout.Alignment.ALIGN_NORMAL,
+                    Constants.SPACING_MULT, Constants.SPACING_ADD, false);
             staticLayout.draw(canvas);
             pdfDocument.finishPage(page);
         }

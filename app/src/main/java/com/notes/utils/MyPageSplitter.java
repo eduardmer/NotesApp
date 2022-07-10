@@ -21,19 +21,26 @@ public class MyPageSplitter {
     }
 
     public List<CharSequence> getPages() {
-        String text = title + "\n" + description;
-        StaticLayout staticLayout = new StaticLayout(text, new TextPaint(), pageWidth,
+        TextPaint titleText = new TextPaint();
+        titleText.setTextSize(25);
+        StaticLayout titleStaticLayout = new StaticLayout(title, titleText, pageWidth,
                 Layout.Alignment.ALIGN_NORMAL, Constants.SPACING_MULT, Constants.SPACING_ADD, false);
+        StaticLayout staticLayout = new StaticLayout(description, new TextPaint(), pageWidth,
+                Layout.Alignment.ALIGN_NORMAL, Constants.SPACING_MULT, Constants.SPACING_ADD, false);
+        int titleHeight = titleStaticLayout.getHeight();
         int lineHeight = staticLayout.getHeight() / staticLayout.getLineCount();
         int pageLineCount = pageHeight / lineHeight;
         int firstLine = 0;
+        int firstPageLines = (pageHeight - titleHeight) / lineHeight;
+        pages.add(description.subSequence(firstLine, staticLayout.getLineEnd(firstPageLines - 1)));
+        firstLine = firstLine + firstPageLines;
         while (firstLine < staticLayout.getLineCount()) {
             if (firstLine >= staticLayout.getLineCount() - pageLineCount && firstLine < staticLayout.getLineCount()) {
-                pages.add(text.subSequence(staticLayout.getLineStart(firstLine), staticLayout.getLineEnd(staticLayout.getLineCount() - 1)));
+                pages.add(description.subSequence(staticLayout.getLineStart(firstLine), staticLayout.getLineEnd(staticLayout.getLineCount() - 1)));
                 break;
             }
 
-            pages.add(text.subSequence(staticLayout.getLineStart(firstLine), staticLayout.getLineEnd(firstLine + pageLineCount - 1)));
+            pages.add(description.subSequence(staticLayout.getLineStart(firstLine), staticLayout.getLineEnd(firstLine + pageLineCount - 1)));
             firstLine = firstLine + pageLineCount;
         }
         return pages;

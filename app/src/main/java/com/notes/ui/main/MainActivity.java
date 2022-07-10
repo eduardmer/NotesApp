@@ -17,6 +17,7 @@ import com.notes.ui.add_notes.AddNoteActivity;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -90,7 +91,9 @@ public class MainActivity extends AppCompatActivity implements AdapterListener{
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
             try {
-                viewModel.getPdfDocument().writeTo(new FileOutputStream(data.getData().toString()));
+                OutputStream outputStream = getContentResolver().openOutputStream(data.getData());
+                viewModel.getPdfDocument().writeTo(outputStream);
+                outputStream.close();
             } catch (IOException e) {
                 e.printStackTrace();
                 Toast.makeText(this, R.string.save_document_error, Toast.LENGTH_SHORT).show();
