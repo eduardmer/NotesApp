@@ -4,14 +4,19 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.Toast;
 import com.google.android.material.datepicker.MaterialDatePicker;
+import com.notes.AlarmReceiver;
 import com.notes.R;
-import com.notes.data.Notes;
 import com.notes.databinding.ActivityAddNoteBinding;
-import java.util.Date;
+import com.notes.ui.main.MainActivity;
+
 import java.util.Objects;
 import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
@@ -39,12 +44,13 @@ public class AddNoteActivity extends AppCompatActivity {
             if (binding.titleText.getText().toString().isEmpty() || binding.descriptionText.getText().toString().isEmpty())
                 Toast.makeText(this, getString(R.string.field_validation), Toast.LENGTH_SHORT).show();
             else
-                compositeDisposable.add(viewModel.insertNote(
+                setAlarm();
+                /*compositeDisposable.add(viewModel.insertNote(
                         new Notes(binding.titleText.getText().toString(), binding.descriptionText.getText().toString(), new Date().getTime(), 0))
                         .subscribe(
                                 this::goBack,
                                 error -> Toast.makeText(this, error.toString(), Toast.LENGTH_SHORT).show()
-                        ));
+                        ));*/
         });
     }
 
@@ -63,6 +69,11 @@ public class AddNoteActivity extends AppCompatActivity {
     }
 
     private void setAlarm() {
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(this, AlarmReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+        AlarmManager.AlarmClockInfo ac = new AlarmManager.AlarmClockInfo(System.currentTimeMillis() + 10 * 1000, null);
+        alarmManager.setAlarmClock(ac, pendingIntent);
     }
 
     @Override
