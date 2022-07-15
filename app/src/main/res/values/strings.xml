@@ -19,4 +19,6 @@
     <string name="save_as_pdf">Save as PDF</string>
     <string name="share">Share</string>
     <string name="delete">Delete</string>
+
+    <string name="stop">Stop</string>
 </resources>
