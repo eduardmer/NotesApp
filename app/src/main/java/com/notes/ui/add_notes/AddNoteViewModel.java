@@ -19,7 +19,7 @@ public class AddNoteViewModel extends ViewModel {
     @Inject
     public AddNoteViewModel(NotesRepository notesRepository){
         this.notesRepository = notesRepository;
-        setReminder = new ObservableField<>();
+        setReminder = new ObservableField<>(false);
     }
 
     public ObservableField<Boolean> getSetReminder() {
