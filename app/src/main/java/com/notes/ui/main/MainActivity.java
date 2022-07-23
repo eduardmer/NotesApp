@@ -8,7 +8,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 import com.notes.R;
 import com.notes.databinding.ActivityMainBinding;
@@ -45,9 +44,7 @@ public class MainActivity extends AppCompatActivity implements AdapterListener{
         binding.addNote.setOnClickListener(v -> startActivity(new Intent(this, AddNoteActivity.class)));
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         binding.recyclerView.setAdapter(adapter);
-        compositeDisposable.add(viewModel.getNotes().subscribe(
-                adapter::update,
-                error -> Log.i("pergjigja", error.toString())));
+        viewModel.getNotesLiveData().observe(this, adapter::update);
     }
 
     @Override
