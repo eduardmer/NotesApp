@@ -8,7 +8,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Toast;
 import com.notes.R;
 import com.notes.databinding.ActivityMainBinding;
@@ -38,28 +37,18 @@ public class MainActivity extends AppCompatActivity implements AdapterListener{
         ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
         viewModel =  new ViewModelProvider(this).get(MainViewModel.class);
+        binding.setViewModel(viewModel);
+        binding.setLifecycleOwner(this);
         NotesAdapter adapter = new NotesAdapter(this, new ArrayList<>());
         binding.addNote.setOnClickListener(v -> startActivity(new Intent(this, AddNoteActivity.class)));
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         binding.recyclerView.setAdapter(adapter);
 
-        viewModel.getState().observe(this, resources -> {
-            switch (resources.getStatus()) {
-                case LOADING:
-                    binding.progressBar.setVisibility(View.VISIBLE);
-                    break;
-                case SUCCESS:
-                    binding.progressBar.setVisibility(View.GONE);
-                    if (resources.getData() != null)
-                        adapter.update(resources.getData());
-                    if (resources.getMessage() != -1)
-                        Toast.makeText(this, resources.getMessage(), Toast.LENGTH_SHORT).show();
-                    break;
-                case ERROR:
-                    binding.progressBar.setVisibility(View.GONE);
-                    Toast.makeText(this, resources.getMessage(), Toast.LENGTH_SHORT).show();
-                    break;
-            }
+        viewModel.getState().observe(this, uiState -> {
+            if (uiState.getMessage() != -1)
+                Toast.makeText(this, uiState.getMessage(), Toast.LENGTH_SHORT).show();
+            if (uiState.getNotes() != null)
+                adapter.update(uiState.getNotes());
         });
     }
 

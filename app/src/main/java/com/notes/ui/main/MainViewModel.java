@@ -4,12 +4,8 @@ import android.graphics.pdf.PdfDocument;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import com.notes.R;
-import com.notes.data.Notes;
 import com.notes.data.NotesRepository;
 import com.notes.utils.PDFDocumentUtils;
-import com.notes.utils.Resources;
-import com.notes.utils.Status;
-import java.util.List;
 import javax.inject.Inject;
 import dagger.hilt.android.lifecycle.HiltViewModel;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -22,30 +18,34 @@ public class MainViewModel extends ViewModel {
 
     private final NotesRepository notesRepository;
     private PdfDocument pdfDocument;
-    private final MutableLiveData<Resources<List<Notes>>> state;
+    private final MutableLiveData<NotesUIState> state;
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     @Inject
     public MainViewModel(NotesRepository notesRepository){
         this.notesRepository = notesRepository;
-        this.state = new MutableLiveData<>(new Resources.Loading<>());
+        this.state = new MutableLiveData<>(new NotesUIState(true, -1, null));
         getNotes();
     }
 
-    public MutableLiveData<Resources<List<Notes>>> getState() {
+    public MutableLiveData<NotesUIState> getState() {
         return state;
     }
 
     private void getNotes() {
         compositeDisposable.add(notesRepository.getNotes().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(
-                notes -> getState().setValue(new Resources.Success<>(Status.SUCCESS, notes, -1))
+                notes -> getState().setValue(new NotesUIState(false, -1, notes)),
+                error -> {
+                    getState().setValue(new NotesUIState(false, R.string.error, null));
+                    error.printStackTrace();
+                }
         ));
     }
 
     public void deleteNote(int id) {
         compositeDisposable.add(notesRepository.deleteNote(id).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(
-                () -> state.postValue(new Resources.Success<>(Status.SUCCESS, null, R.string.delete_note)),
-                error -> state.postValue(new Resources.Error<>(Status.ERROR, null, R.string.error))
+                () -> state.setValue(new NotesUIState(false, R.string.delete_note, null)),
+                error -> state.setValue(new NotesUIState(false, R.string.error, null))
         ));
     }
 
