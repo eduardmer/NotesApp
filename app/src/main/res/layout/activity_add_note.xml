@@ -95,8 +95,10 @@
                     android:id="@+id/date_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@{viewModel.reminderTime}"
+                    android:enabled="true"
+                    android:focusable="false"
                     android:inputType="none"
+                    android:text="@{viewModel.reminderTime}"
                     android:textSize="14sp" />
 
             </com.google.android.material.textfield.TextInputLayout>

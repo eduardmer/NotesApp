@@ -10,7 +10,7 @@ import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 import com.notes.BR;
 import com.notes.R;
-import com.notes.data.Notes;
+import com.notes.data.entities.Notes;
 import com.notes.databinding.ItemNoteBinding;
 import com.notes.ui.main.AdapterListener;
 import java.util.List;

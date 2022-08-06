@@ -4,8 +4,8 @@ import android.content.Context;
 
 import androidx.room.Room;
 
-import com.notes.data.AppDatabase;
-import com.notes.data.NotesDao;
+import com.notes.data.database.AppDatabase;
+import com.notes.data.database.NotesDao;
 
 import javax.inject.Singleton;
 

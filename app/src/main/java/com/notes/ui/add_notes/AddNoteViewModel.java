@@ -2,20 +2,17 @@ package com.notes.ui.add_notes;
 
 import androidx.databinding.ObservableField;
 import androidx.lifecycle.ViewModel;
-import com.notes.data.Notes;
-import com.notes.data.NotesRepository;
-
+import com.notes.data.entities.Notes;
+import com.notes.data.database.NotesRepository;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.Objects;
-
 import javax.inject.Inject;
 import dagger.hilt.android.lifecycle.HiltViewModel;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.core.Completable;
+import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 @HiltViewModel
@@ -31,6 +28,10 @@ public class AddNoteViewModel extends ViewModel {
         this.notesRepository = notesRepository;
         setReminder = new ObservableField<>(false);
         reminderTime = new ObservableField<>(new GregorianCalendar());
+    }
+
+    public Single<Long> insertNote(Notes note) {
+        return notesRepository.insertNote(note).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
     }
 
     public ObservableField<Boolean> getSetReminder() {
@@ -50,9 +51,9 @@ public class AddNoteViewModel extends ViewModel {
     }
 
     public void setReminderDate(long date) {
-        Calendar calendar = reminderTime.get();
-        Objects.requireNonNull(calendar).setTimeInMillis(date);
-        Objects.requireNonNull(reminderTime.get()).setTimeInMillis(date);
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTimeInMillis(date);
+        reminderTime.set(calendar);
     }
 
     public void setReminderTime(int hour, int minute) {
@@ -61,9 +62,5 @@ public class AddNoteViewModel extends ViewModel {
         calendar.set(Calendar.MINUTE, minute);
         calendar.set(Calendar.SECOND, 0);
         reminderTime.set(calendar);
-    }
-
-    public Completable insertNote(Notes note) {
-        return notesRepository.insertNote(note).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
     }
 }

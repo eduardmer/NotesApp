@@ -16,7 +16,7 @@ import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
 import com.notes.AlarmReceiver;
 import com.notes.R;
-import com.notes.data.Notes;
+import com.notes.data.entities.Notes;
 import com.notes.databinding.ActivityAddNoteBinding;
 import com.notes.utils.Constants;
 import java.util.Date;
@@ -42,28 +42,26 @@ public class AddNoteActivity extends AppCompatActivity {
 
         binding.reminderSwitch.setOnCheckedChangeListener(((compoundButton, b) -> viewModel.setReminder(b)));
         binding.dateText.setOnClickListener(v -> showDatePicker());
-        binding.cancelButton.setOnClickListener(v -> goBack());
+        binding.cancelButton.setOnClickListener(v -> onBackPressed());
         binding.saveButton.setOnClickListener(v -> {
-            if (binding.titleText.getText().toString().isEmpty() || binding.descriptionText.getText().toString().isEmpty())
+            if (Objects.requireNonNull(binding.titleText.getText()).toString().isEmpty() || Objects.requireNonNull(binding.descriptionText.getText()).toString().isEmpty())
                 Toast.makeText(this, R.string.field_validation, Toast.LENGTH_SHORT).show();
             else if (viewModel.getSetReminder().get() && viewModel.getReminderTimeInMillis() < System.currentTimeMillis() + 60 * 1000)
                 Toast.makeText(this, R.string.time_validation, Toast.LENGTH_SHORT).show();
             else {
-                compositeDisposable.add(viewModel.insertNote(new Notes(binding.titleText.getText().toString(), binding.descriptionText.getText().toString(), new Date().getTime(), viewModel.getSetReminder().get() ? viewModel.getReminderTimeInMillis() : 0))
-                        .subscribe(
-                                () -> {
-                                    if (viewModel.getSetReminder().get())
-                                        setAlarm(viewModel.getReminderTimeInMillis());
-                                    goBack();
-                                },
-                                error -> Toast.makeText(this, error.toString(), Toast.LENGTH_SHORT).show()
-                        ));
+                insertNote();
             }
         });
     }
 
-    private void goBack(){
-        onBackPressed();
+    private void insertNote() {
+        compositeDisposable.add(viewModel.insertNote(new Notes(binding.titleText.getText().toString(), binding.descriptionText.getText().toString(), new Date().getTime(), viewModel.getSetReminder().get() ? viewModel.getReminderTimeInMillis() : 0)).subscribe(
+                id -> {
+                    if (viewModel.getSetReminder().get())
+                        setAlarm(id.intValue(), viewModel.getReminderTimeInMillis());
+                    onBackPressed();
+                    },
+                error -> Toast.makeText(this, error.toString(), Toast.LENGTH_SHORT).show()));
     }
 
     private void showDatePicker() {
@@ -81,10 +79,10 @@ public class AddNoteActivity extends AppCompatActivity {
         timePicker.show(getSupportFragmentManager(), Constants.TIME_PICKER_TAG);
     }
 
-    private void setAlarm(long alarmTime) {
+    private void setAlarm(int noteId, long alarmTime) {
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(getApplicationContext(), AlarmReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, (int) alarmTime, intent, 0);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, noteId, intent, 0);
         AlarmManager.AlarmClockInfo ac = new AlarmManager.AlarmClockInfo(alarmTime, null);
         alarmManager.setAlarmClock(ac, pendingIntent);
     }

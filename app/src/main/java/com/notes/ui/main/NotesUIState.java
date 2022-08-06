@@ -1,6 +1,6 @@
 package com.notes.ui.main;
 
-import com.notes.data.Notes;
+import com.notes.data.entities.Notes;
 
 import java.util.List;
 

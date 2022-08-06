@@ -1,4 +1,6 @@
-package com.notes.data;
+package com.notes.data.database;
+
+import com.notes.data.entities.Notes;
 
 import java.util.List;
 
@@ -6,6 +8,7 @@ import javax.inject.Inject;
 
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.core.Single;
 
 public class NotesRepository {
 
@@ -20,8 +23,8 @@ public class NotesRepository {
         return notesDao.getNotes();
     }
 
-    public Completable insertNote(Notes note){
-       return notesDao.insertNote(note);
+    public Single<Long> insertNote(Notes note) {
+        return notesDao.insertNote(note);
     }
 
     public Completable deleteNote(int id){
