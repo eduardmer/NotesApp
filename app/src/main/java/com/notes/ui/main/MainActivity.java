@@ -1,18 +1,19 @@
 package com.notes.ui.main;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import android.content.Intent;
+import android.graphics.pdf.PdfDocument;
 import android.os.Bundle;
 import android.widget.Toast;
 import com.notes.R;
 import com.notes.databinding.ActivityMainBinding;
 import com.notes.ui.adapter.NotesAdapter;
 import com.notes.ui.add_notes.AddNoteActivity;
+import com.notes.utils.Constants;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -29,14 +30,15 @@ public class MainActivity extends AppCompatActivity implements AdapterListener{
 
     MainViewModel viewModel;
     final CompositeDisposable compositeDisposable = new CompositeDisposable();
-    final SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.getDefault());
+    private PdfDocument pdfDocument;
+    final SimpleDateFormat dateFormat = new SimpleDateFormat(Constants.DATE_TIME_FORMAT, Locale.getDefault());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
-        viewModel =  new ViewModelProvider(this).get(MainViewModel.class);
+        viewModel = new ViewModelProvider(this).get(MainViewModel.class);
         binding.setViewModel(viewModel);
         binding.setLifecycleOwner(this);
         NotesAdapter adapter = new NotesAdapter(this, new ArrayList<>());
@@ -55,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements AdapterListener{
     @Override
     public void createPDF(String title, String description) {
         compositeDisposable.add(viewModel.createPdfDocument(title, description).subscribe(pdfDocument -> {
+            this.pdfDocument = pdfDocument;
             Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT)
                     .addCategory(Intent.CATEGORY_OPENABLE)
                     .setType("application/pdf")
@@ -86,18 +89,18 @@ public class MainActivity extends AppCompatActivity implements AdapterListener{
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
             try {
                 OutputStream outputStream = getContentResolver().openOutputStream(data.getData());
-                viewModel.getPdfDocument().writeTo(outputStream);
+                pdfDocument.writeTo(outputStream);
                 outputStream.close();
             } catch (IOException e) {
                 e.printStackTrace();
                 Toast.makeText(this, R.string.save_document_error, Toast.LENGTH_SHORT).show();
             } finally {
-                viewModel.getPdfDocument().close();
+                pdfDocument.close();
             }
         }
     }

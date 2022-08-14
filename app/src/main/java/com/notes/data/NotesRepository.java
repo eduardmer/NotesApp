@@ -1,5 +1,6 @@
-package com.notes.data.database;
+package com.notes.data;
 
+import com.notes.data.database.NotesDao;
 import com.notes.data.entities.Notes;
 
 import java.util.List;

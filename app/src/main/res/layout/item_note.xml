@@ -72,6 +72,7 @@
                 android:layout_marginBottom="10dp"
                 android:textColor="@color/black"
                 android:textStyle="bold"
+                app:date_24h="@{data.createdDate}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/description_text" />

@@ -4,12 +4,14 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
+import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.timepicker.MaterialTimePicker;
@@ -25,7 +27,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 
 @AndroidEntryPoint
-public class AddNoteActivity extends AppCompatActivity {
+public class AddNoteActivity extends AppCompatActivity implements View.OnClickListener {
 
     ActivityAddNoteBinding binding;
     AddNoteViewModel viewModel;
@@ -41,41 +43,52 @@ public class AddNoteActivity extends AppCompatActivity {
         binding.setViewModel(viewModel);
 
         binding.reminderSwitch.setOnCheckedChangeListener(((compoundButton, b) -> viewModel.setReminder(b)));
-        binding.dateText.setOnClickListener(v -> showDatePicker());
-        binding.cancelButton.setOnClickListener(v -> onBackPressed());
-        binding.saveButton.setOnClickListener(v -> {
-            if (Objects.requireNonNull(binding.titleText.getText()).toString().isEmpty() || Objects.requireNonNull(binding.descriptionText.getText()).toString().isEmpty())
-                Toast.makeText(this, R.string.field_validation, Toast.LENGTH_SHORT).show();
-            else if (viewModel.getSetReminder().get() && viewModel.getReminderTimeInMillis() < System.currentTimeMillis() + 60 * 1000)
-                Toast.makeText(this, R.string.time_validation, Toast.LENGTH_SHORT).show();
-            else {
-                insertNote();
-            }
-        });
+        binding.dateText.setOnClickListener(this);
+        binding.cancelButton.setOnClickListener(this);
+        binding.saveButton.setOnClickListener(this);
     }
 
-    private void insertNote() {
-        compositeDisposable.add(viewModel.insertNote(new Notes(binding.titleText.getText().toString(), binding.descriptionText.getText().toString(), new Date().getTime(), viewModel.getSetReminder().get() ? viewModel.getReminderTimeInMillis() : 0)).subscribe(
+    @SuppressLint("NonConstantResourceId")
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.date_text:
+                showDatePicker();
+                break;
+            case R.id.cancel_button:
+                onBackPressed();
+                break;
+            case R.id.save_button:
+                String title = Objects.requireNonNull(binding.titleText.getText()).toString();
+                String description = Objects.requireNonNull(binding.descriptionText.getText()).toString();
+                if (title.isEmpty() || description.isEmpty())
+                    Toast.makeText(this, R.string.field_validation, Toast.LENGTH_SHORT).show();
+                else if (viewModel.getSetReminder().get() && viewModel.getReminderTimeInMillis() < System.currentTimeMillis() + 60 * 1000)
+                    Toast.makeText(this, R.string.time_validation, Toast.LENGTH_SHORT).show();
+                else
+                    insertNote(title, description);
+        }
+    }
+
+    private void insertNote(String title, String description) {
+        compositeDisposable.add(viewModel.insertNote(new Notes(title, description, new Date().getTime(), viewModel.getSetReminder().get() ? viewModel.getReminderTimeInMillis() : 0)).subscribe(
                 id -> {
                     if (viewModel.getSetReminder().get())
                         setAlarm(id.intValue(), viewModel.getReminderTimeInMillis());
                     onBackPressed();
-                    },
+                },
                 error -> Toast.makeText(this, error.toString(), Toast.LENGTH_SHORT).show()));
     }
 
     private void showDatePicker() {
         MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder.datePicker().setTitleText(R.string.select_date).build();
-        datePicker.addOnPositiveButtonClickListener(date -> {
-            viewModel.setReminderDate(date);
-            showTimePicker();
-        });
+        datePicker.addOnPositiveButtonClickListener(this::showTimePicker);
         datePicker.show(getSupportFragmentManager(), Constants.DATE_PICKER_TAG);
     }
 
-    private void showTimePicker() {
+    private void showTimePicker(long date) {
         MaterialTimePicker timePicker = new MaterialTimePicker.Builder().setTimeFormat(TimeFormat.CLOCK_24H).setTitleText(R.string.select_time).build();
-        timePicker.addOnPositiveButtonClickListener(v -> viewModel.setReminderTime(timePicker.getHour(), timePicker.getMinute()));
+        timePicker.addOnPositiveButtonClickListener(v -> viewModel.setReminderTime(date, timePicker.getHour(), timePicker.getMinute()));
         timePicker.show(getSupportFragmentManager(), Constants.TIME_PICKER_TAG);
     }
 

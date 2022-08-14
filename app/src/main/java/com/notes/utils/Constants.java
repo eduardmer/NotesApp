@@ -6,9 +6,11 @@ public class Constants {
 
     public static final String TIME_PICKER_TAG = "SELECT_TIME";
 
+    public static final String DATE_FORMAT_24H = "HH:mm";
+
     public static final String DATE_FORMAT = "dd/MM/yyyy";
 
-    public static final String DATE_TIME_FORMAT = "dd/MM/yyyy hh:mm";
+    public static final String DATE_TIME_FORMAT = "dd/MM/yyyy hh:mm:ss";
 
     public static final int PAGE_HEIGHT = 842;
 

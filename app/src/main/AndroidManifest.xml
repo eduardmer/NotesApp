@@ -15,14 +15,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Notes">
         <activity
-            android:name=".ui.main.MainActivity"
+            android:name=".ui.turn_off_alarm.TurnOffAlarmActivity"
             android:exported="false"
             android:showOnLockScreen="true"/>
         <activity
             android:name=".ui.add_notes.AddNoteActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.turn_off_alarm.TurnOffAlarmActivity"
+            android:name=".ui.main.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

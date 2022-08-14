@@ -36,7 +36,6 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
 
         public void bind(AdapterListener listener, Notes note) {
             binding.setVariable(BR.data, note);
-            binding.dateText.setText("18:24");
             binding.executePendingBindings();
             binding.settingsButton.setOnClickListener(v -> showPopUpMenu(listener, note, v.getContext(), v));
         }
